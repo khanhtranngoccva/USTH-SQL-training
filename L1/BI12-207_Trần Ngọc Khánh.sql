@@ -1,0 +1,102 @@
+/* Exercise 1-3: Create database, set working database and create tables with schema */
+DROP DATABASE Company;
+CREATE DATABASE IF NOT EXISTS Company;
+USE Company;
+
+CREATE TABLE IF NOT EXISTS EMPLOYEE (
+    Fname VARCHAR(20) NOT NULL,
+    Minit VARCHAR(20),
+    Lname VARCHAR(20) NOT NULL,
+    Ssn VARCHAR(11) PRIMARY KEY NOT NULL,
+    Bdate DATE NOT NULL,
+    Address VARCHAR(100),
+    Sex CHAR NOT NULL,
+    Salary INT NOT NULL,
+    Super_ssn VARCHAR(11),
+    Dno INT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS DEPARTMENT (
+    Dname VARCHAR(50) NOT NULL,
+    Dnumber INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    Mgr_ssn VARCHAR(11),
+    FOREIGN KEY (Mgr_ssn)
+        REFERENCES EMPLOYEE (Ssn),
+    Mgr_start_date DATE
+);
+
+ALTER TABLE EMPLOYEE ADD CONSTRAINT FOREIGN KEY (Dno) REFERENCES DEPARTMENT (Dnumber);
+ALTER TABLE EMPLOYEE ADD CONSTRAINT FOREIGN KEY (Super_ssn) REFERENCES EMPLOYEE (Ssn);
+
+CREATE TABLE IF NOT EXISTS DEPT_LOCATIONS (
+    Dnumber INT NOT NULL PRIMARY KEY,
+    FOREIGN KEY (Dnumber)
+        REFERENCES DEPARTMENT (Dnumber),
+    Dlocation VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS PROJECT (
+    Pname VARCHAR(100) NOT NULL,
+    Pnumber INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    Plocation VARCHAR(100),
+    Dnum INT NOT NULL,
+    FOREIGN KEY (Dnum)
+        REFERENCES DEPARTMENT (Dnumber)
+);
+
+CREATE TABLE IF NOT EXISTS WORKS_ON (
+    Essn VARCHAR(11) NOT NULL,
+    Pno INT NOT NULL,
+    Hours INT NOT NULL,
+    FOREIGN KEY (Essn)
+        REFERENCES EMPLOYEE (Ssn),
+    FOREIGN KEY (Pno)
+        REFERENCES PROJECT (Pnumber)
+);
+
+CREATE TABLE IF NOT EXISTS DEPENDENT (
+    Essn VARCHAR(11) NOT NULL,
+    Dependent_name VARCHAR(50) NOT NULL,
+    Sex CHAR NOT NULL,
+    Bdate DATE NOT NULL,
+    Relationship VARCHAR(20) NOT NULL,
+    FOREIGN KEY (Essn)
+        REFERENCES EMPLOYEE (Ssn)
+);
+
+/* Exercise 4: Add a Partner_ssn column that refers to the employee's spouse */
+ALTER TABLE EMPLOYEE ADD COLUMN Partner_ssn VARCHAR(11);
+
+/* Exercise 5: Sample columns */
+INSERT INTO DEPARTMENT (Dname) VALUES ("Marketing");
+
+INSERT INTO EMPLOYEE 
+(Fname, Lname, Ssn, Bdate, Address, Sex, Salary, Dno)
+VALUES ("Bob", "Boberson", "123-45-6789", "1990-12-27", "100 High Street", "M", 125000, 1);
+
+INSERT INTO EMPLOYEE 
+(Fname, Lname, Ssn, Bdate, Address, Sex, Salary, Dno, Super_ssn)
+VALUES ("Bobby", "Boberson", "200-45-6789", "1990-12-27", "100 High Street", "M", 125000, 1, "123-45-6789");
+
+UPDATE DEPARTMENT SET Mgr_ssn = "123-45-6789", Mgr_start_date = "2010-12-27" WHERE Dnumber = 1;
+
+INSERT INTO DEPT_LOCATIONS (Dnumber, Dlocation)
+VALUES (1, "4th floor");
+
+INSERT INTO PROJECT (Pname, Plocation, Dnum)
+VALUES ("Company presentation", "5th floor", 1);
+
+INSERT INTO WORKS_ON VALUES ("123-45-6789", 1, 20);
+
+INSERT INTO DEPENDENT VALUES ("123-45-6789", "Mary", "F", "1960-12-20", "Mother");
+
+SELECT * FROM EMPLOYEE;
+SELECT * FROM DEPARTMENT;
+SELECT * FROM DEPT_LOCATIONS;
+SELECT * FROM PROJECT;
+SELECT * FROM WORKS_ON;
+SELECT * FROM DEPENDENT;
+
+
+/* Exercise 6: Clear all tables from the database */
+DROP TABLE IF EXISTS EMPLOYEE, DEPARTMENT, DEPT_LOCATIONS, PROJECT, WORKS_ON, DEPENDENT;
